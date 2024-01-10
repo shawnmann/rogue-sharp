@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://cfc4gjn6euxoo"]
+
+[ext_resource type="Script" path="res://src/PlayerCharacter.cs" id="1_u7grj"]
+
+[node name="PlayerCharacter" type="Node2D"]
+script = ExtResource("1_u7grj")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]

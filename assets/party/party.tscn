@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://yot241fvmu17"]
+
+[ext_resource type="Script" path="res://src/Party.cs" id="1_p16cp"]
+
+[node name="Party" type="Node2D"]
+script = ExtResource("1_p16cp")
