@@ -200,7 +200,8 @@ public partial class WaveFunctionCollapse
         //  with the lowest entropy
         var cell = preselectedCell ?? GetCellWithLowestEntropy();
         
-        GD.Print($"CHOSEN: ({cell.X},{cell.Y}) E: {cell.Entropy} S: {cell.Solved}");
+        // DEBUG:
+        //GD.Print($"CHOSEN: ({cell.X},{cell.Y}) E: {cell.Entropy} S: {cell.Solved}");
 
         // Collapse that cell's state (choose a tile for it to be)
         // Choose a tile out of this cell's possible tiles at random

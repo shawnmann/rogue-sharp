@@ -4,11 +4,17 @@ using Rogue;
 
 public partial class Main : Node
 {
+    private World _world;
     private Grid _grid;
     
     public override void _Ready()
     {
         base._Ready();
+
+        _world = new World();
+        _world.Initialize();
+        GD.Print("CREATE WORLD:");
+        GD.Print(_world.Zones);
 
         _grid = new Grid();
 
