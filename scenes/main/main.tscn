@@ -20,6 +20,8 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="SubViewport" type="SubViewport" parent="VBoxContainer/HBoxContainer/SubViewportContainer"]
+handle_input_locally = false
+render_target_update_mode = 4
 
 [node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -28,3 +30,8 @@ text = "Log Information Goes Here"
 [node name="Label2" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 text = "Party Info"
+
+[node name="Button" type="Button" parent="."]
+offset_right = 8.0
+offset_bottom = 8.0
+text = "GENERATE"
