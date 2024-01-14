@@ -1,12 +1,15 @@
 using Godot;
 using System;
+using System.Linq;
+using Rogue;
+using Rogue.Generation.World;
 
 public partial class FastNoise
 {
     public FastNoiseLite elevation;
     public FastNoiseLite moisture;
     public FastNoiseLite temperature;
-    public String[,] MapInfo;
+    public Biome[,] MapInfo;
     
     public FastNoise(int width, int height)
     {
@@ -17,6 +20,7 @@ public partial class FastNoise
         // Basically generate height, temperature, and moisture
         // then decide, based on those maps, what each tile is
         
+        // Generate an elevation map
         random.Randomize();
         elevation = new FastNoiseLite();
         elevation.Seed = random.RandiRange(0, 500);
@@ -29,6 +33,7 @@ public partial class FastNoise
         elevation.CellularJitter = 50;
         elevation.DomainWarpEnabled = true;
         
+        // Generate a moisture map
         random.Randomize();
         moisture = new FastNoiseLite();
         moisture.Seed = random.RandiRange(0, 500);
@@ -41,6 +46,7 @@ public partial class FastNoise
         moisture.CellularJitter = 50;
         moisture.DomainWarpEnabled = true;
         
+        // Generate a temperature map
         random.Randomize();
         temperature = new FastNoiseLite();
         temperature.Seed = random.RandiRange(0, 500);
@@ -53,16 +59,49 @@ public partial class FastNoise
         temperature.CellularJitter = 50;
         temperature.DomainWarpEnabled = true;
 
-        MapInfo = new String[width, height];
+        MapInfo = new Biome[width, height];
 
+        // Hold the max and mins of each value
         float maxE = 0;
         float minE = 0;
         float maxT = 0;
         float minT = 0;
         float maxM = 0;
         float minM = 0;
-        float seaLevel = 0; //10000
+        
+        // If we want to use sea level
+        float seaLevel = 0; //~10000 meters is the deepest part of Earth's ocean
 
+        // Make arrays to hold the sorted values of each 
+        float[] sortedMoisture = new float[width * height];
+        float[] sortedTemperature = new float[width * height];
+        float[] sortedElevation = new float[width * height];
+
+        // Add results to a flat array so we can sort them
+        int i = 0;
+        for (var x = 0; x < width; x++)
+        {
+            for (var y = 0; y < height; y++)
+            {
+                sortedMoisture[i] = moisture.GetNoise2D(x, y);
+                sortedTemperature[i] = temperature.GetNoise2D(x, y);
+                sortedElevation[i] = elevation.GetNoise2D(x, y);
+                i++;
+            }
+        }
+
+        // Sort the flat versions of the arrays so we can use them to calculate stuff
+        Array.Sort(sortedMoisture);
+        Array.Sort(sortedTemperature);
+        Array.Sort(sortedElevation);
+
+        // Get thresholds so we can assign biomes
+        var moistureLowLimit = sortedMoisture[(int)Math.Floor(sortedMoisture.Length * .3)];
+        var moistureMedLimit = sortedMoisture[(int)Math.Floor(sortedMoisture.Length * .6)];
+        var tempLowLimit = sortedTemperature[(int)Math.Floor(sortedTemperature.Length * .3)];
+        var tempMedLimit = sortedTemperature[(int)Math.Floor(sortedTemperature.Length * .6)];
+
+        // Go through and decide biomes
         for (var x = 0; x < width; x++)
         {
             for (var y = 0; y < height; y++)
@@ -72,88 +111,74 @@ public partial class FastNoise
                 var e = elevation.GetNoise2D(x, y);
                 var t = temperature.GetNoise2D(x, y);
                 
-                // Convert temp to between 0 and 40 (degrees celsius?)
-                t = (int)Math.Floor(t * 40);
+                BiomeMoistures biomeMoisture;
+                BiomeTemps biomeTemp;
 
-                // Convert elevation to between 0 and 19000 (meters?)
-                // 0 is bottom of sea, sea is ~10,000m deep, so 10,000 is sea level
-                e = (int)Math.Floor(e * 19000);
-                
-                // Convert moisture to between 0 and 400 (cm annual precipitation)
-                m = (int)Math.Floor(m * 400);
-                
-                // You lose 10 degrees celsius per 1,000 meters of elevation
-
-                if (x == 0 && y == 0)
+                if (m < moistureLowLimit)
                 {
-                    maxE = e;
-                    minE = e;
-                    maxM = m;
-                    minM = m;
-                    maxT = t;
-                    minT = t;
+                    biomeMoisture = BiomeMoistures.Dry;
+                } else if (m < moistureMedLimit)
+                {
+                    biomeMoisture = BiomeMoistures.Moderate;
                 }
                 else
                 {
-                    maxE = e > maxE ? e : maxE;
-                    minE = e < minE ? e : minE;
-                    maxT = t > maxT ? t : maxT;
-                    minT = t < minT ? t : minT;
-                    maxM = m > maxM ? m : maxM;
-                    minM = m < minM ? m : minM;
+                    biomeMoisture = BiomeMoistures.Wet;
                 }
 
-                var value = "X";
-
-                if (e < seaLevel)
+                if (t < tempLowLimit)
                 {
-                    // We are below sea level, so just make me water
-                    value = "W";
-                }
-
-                if (e >= seaLevel)
+                    biomeTemp = BiomeTemps.Cold;
+                } else if (t < tempMedLimit)
                 {
-                    // We are above sea level
-                    if (t > 32)
-                    {
-                        if (m > 250)
-                        {
-                            value = "TROPICAL_RAINFOREST";
-                        } else if (m > 80)
-                        {
-                            value = "SAVANNA";
-                        }
-                        else
-                        {
-                            value = "DESERT";
-                        }
-                    } else if (t > 15)
-                    {
-                        if (m > 200)
-                        {
-                            value = "TEMPERATE_RAINFOREST";
-                        } else if (m > 100)
-                        {
-                            value = "TEMPERATE_SEASONAL_RAINFOREST";
-                        } else if (m > 50)
-                        {
-                            value = "SHRUBLAND";
-                        }
-                        else
-                        {
-                            value = "TEMPERATE_GRASSLAND";
-                        }
-                    } else if (t > 10)
-                    {
-                        value = "BOREAL_FOREST";
-                    }
-                    else
-                    {
-                        value = "TUNDRA";
-                    }
+                    biomeTemp = BiomeTemps.Temperate;
                 }
-
-                MapInfo[x, y] = value;
+                else
+                {
+                    biomeTemp = BiomeTemps.Hot;
+                }
+                
+                // Load the biome into the results
+                MapInfo[x, y] = GameConstants.GetBiome(biomeMoisture, biomeTemp);
+            }
+        }
+        
+        // Now go through and make sure all biome cells are orthogonal to the same biome
+        //  so we don't have hanging cells...
+        for (var x = 0; x < width; x++)
+        {
+            for (var y = 0; y < height; y++)
+            {
+                var thisBiome = MapInfo[x, y].BiomeType;
+                var topBiome = y > 0 ? MapInfo[x, y - 1].BiomeType : (BiomeTypes?)null;
+                var bottomBiome = y < height - 1 ? MapInfo[x, y + 1].BiomeType : (BiomeTypes?)null;
+                var leftBiome = x > 0 ? MapInfo[x - 1, y].BiomeType : (BiomeTypes?)null;
+                var rightBiome = x < width - 1 ? MapInfo[x + 1, y].BiomeType : (BiomeTypes?)null;
+                
+                if ((topBiome != thisBiome && topBiome != null) &&
+                    (bottomBiome != thisBiome && bottomBiome != null) &&
+                    (leftBiome != thisBiome && leftBiome != null) &&
+                    (rightBiome != thisBiome && rightBiome != null))
+                {
+                    // There is no equal biome orthogonal...
+                    //  ...so we need to change this one
+                    var switchedBiome = (BiomeTypes?)null;
+                    while (switchedBiome == null)
+                    {
+                        // Randomly pick a neighbor to switch this to
+                        random.Randomize();
+                        var r = random.RandiRange(0, 3);
+                        switchedBiome = r switch
+                        {
+                            0 => topBiome,
+                            1 => bottomBiome,
+                            2 => leftBiome,
+                            3 => rightBiome,
+                            _ => null
+                        };
+                    }
+                    MapInfo[x, y] = GameConstants.GetBiome(switchedBiome);
+                }
             }
         }
         
