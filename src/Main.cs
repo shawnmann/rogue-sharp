@@ -55,46 +55,28 @@ public partial class Main : Node
 
                 ColorRect rect = new ColorRect();
                 //rect.Color = new Color(absNoise, 0, 0);
-                switch (noise.MapInfo[x, y])
+                rect.Color = noise.MapInfo[x, y].BiomeType switch
                 {
-                    case "W":
-                        rect.Color = new Color(0, 0.569f, 1);
-                        break; 
-                    case "TROPICAL_RAINFOREST":
-                        rect.Color = new Color(0, 0.769f, 0.239f);
-                        break;
-                    case "SAVANNA":
-                        rect.Color = new Color(0.922f, 0.902f, 0);
-                        break;
-                    case "DESERT":
-                        rect.Color = new Color(0.922f, 0.561f, 0);
-                        break;
-                    case "TEMPERATE_RAINFOREST":
-                        rect.Color = new Color(0, 0.631f, 0.71f);
-                        break;
-                    case "TEMPERATE_SEASONAL_RAINFOREST":
-                        rect.Color = new Color(0, 0.678f, 0.851f);
-                        break;
-                    case "SHRUBLAND":
-                        rect.Color = new Color(0.988f, 0.69f, 0);
-                        break;
-                    case "TEMPERATE_GRASSLAND":
-                        rect.Color = new Color(0.812f, 0.69f, 0.31f);
-                        break;
-                    case "BOREAL_FOREST":
-                        rect.Color = new Color(0.29f, 0.89f, 0.69f);
-                        break;
-                    case "TUNDRA":
-                        rect.Color = new Color(0.91f, 0.949f, 0.941f);
-                        break;
-                    case "X":
-                        rect.Color = new Color(0, 0, 0);
-                        break;
-                }
+                    BiomeTypes.Desert => new Color(1, 0.9f, 0),
+                    BiomeTypes.Scrubland => new Color(1, 0.7f, 0),
+                    BiomeTypes.Tundra => new Color(0.8f, 0.9f, 1),
+                    
+                    BiomeTypes.Savanna => new Color(0.9f, 0.9f, 0),
+                    BiomeTypes.Plains => new Color(0.7f, 0.9f, 0),
+                    BiomeTypes.Steppe => new Color(0.7f, 0.9f, 0.7f),
+                    
+                    BiomeTypes.Jungle => new Color(0, 0.6f, 0.125f),
+                    BiomeTypes.Forest => new Color(0, 0.8f, 0.125f),
+                    BiomeTypes.Boreal => new Color(0, 1, 0.125f),
+                    _ => rect.Color
+                };
                 rect.Size = new Vector2(10, 10);
                 rect.GlobalPosition = new Vector2(x * 10, y * 10);
                 AddChild(rect);
                 rect.AddToGroup("test_tiles");
+
+                var biome = noise.MapInfo[x, y].BiomeType;
+                rect.MouseEntered += () => GD.Print(biome);
             }
         }
     }
