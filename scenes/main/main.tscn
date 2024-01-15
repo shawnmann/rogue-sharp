@@ -30,8 +30,3 @@ text = "Log Information Goes Here"
 [node name="Label2" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 text = "Party Info"
-
-[node name="Button" type="Button" parent="."]
-offset_right = 8.0
-offset_bottom = 8.0
-text = "GENERATE"
