@@ -144,12 +144,14 @@ public partial class FastNoise
         }
         
         // Now go through and make sure all biome cells are orthogonal to the same biome
-        //  so we don't have hanging cells...
+        //  so we don't have hanging/diagonal cells...
         for (var x = 0; x < width; x++)
         {
             for (var y = 0; y < height; y++)
             {
                 var thisBiome = MapInfo[x, y].BiomeType;
+                
+                // Grab the neighboring biomes
                 var topBiome = y > 0 ? MapInfo[x, y - 1].BiomeType : (BiomeTypes?)null;
                 var bottomBiome = y < height - 1 ? MapInfo[x, y + 1].BiomeType : (BiomeTypes?)null;
                 var leftBiome = x > 0 ? MapInfo[x - 1, y].BiomeType : (BiomeTypes?)null;
@@ -160,8 +162,7 @@ public partial class FastNoise
                     (leftBiome != thisBiome && leftBiome != null) &&
                     (rightBiome != thisBiome && rightBiome != null))
                 {
-                    // There is no equal biome orthogonal...
-                    //  ...so we need to change this one
+                    // There is no equal biome orthogonal so we need to change this one
                     var switchedBiome = (BiomeTypes?)null;
                     while (switchedBiome == null)
                     {
@@ -181,6 +182,23 @@ public partial class FastNoise
                 }
             }
         }
+        
+        // TODO: Rivers
+        // Choose a random cell along the top row
+        
+        /*random.Randomize();
+        var riverStartingX = random.RandiRange(20, width - 20);
+        var river = new Vector2[height - 1];
+        for (var y = 0; y < height; y++)
+        {
+            // Get the previous x (or if this is the first row, get the starting point)
+            var x = y == 0 ? riverStartingX : river[y - 1].X;
+            
+            // TODO: Some algorithm that winds the river top to bottom...
+            
+            // Add the next cell to the river
+            river[y] = new Vector2(x, y);
+        }*/
         
         GD.Print($"ELEVATION - MAX: {maxE} MIN: {minE}");
         GD.Print($"MOISTURE - MAX: {maxM} MIN: {minM}");

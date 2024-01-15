@@ -3,12 +3,15 @@ using System;
 
 public partial class MainMenu : Control
 {
+    private Global _global;
     private Button _newGameButton;
     private Button _quitButton;
     
     public override void _Ready()
     {
         base._Ready();
+        
+        _global = GetNode<Global>("/root/Global");
 
         _newGameButton = GetNode<Button>("%NewGameButton");
         _newGameButton.Pressed += NewGameButtonOnPressed;
@@ -19,7 +22,7 @@ public partial class MainMenu : Control
 
     private void NewGameButtonOnPressed()
     {
-        GetTree().ChangeSceneToFile("res://scenes/main/main.tscn");
+        _global.GotoScene("res://scenes/main/main.tscn");
     }
     
     private void QuitButtonOnPressed()
