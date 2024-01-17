@@ -4,6 +4,12 @@ using System.Collections.Generic;
 
 public partial class Party : Node2D
 {
+	private Global _global;
+	private GameState _gameState;
+	
+	[Signal]
+	public delegate void PartyLeavingGridEventHandler(Vector2 partyGridPosition);
+	
 	// This will hold where on the grid the party is "located",
 	//  which is just where the party leader is located
     private Vector2I _currentGridPosition = new(10, 5);
@@ -94,29 +100,29 @@ public partial class Party : Node2D
 	    // This will hold where the party is trying to move to, if they are moving
 	    var targetCellPosition = _currentGridPosition;
 	    // Can the party move to their target?
-	    var canMove = false;
+	    var isMoving = false;
 	    
 	    // Check for any actions the party cares about
 	    if (@event.IsActionPressed("move_up"))
 	    {
 		    targetCellPosition.Y--;
-		    canMove = true;
+		    isMoving = true;
 	    } else if (@event.IsActionPressed("move_down"))
 	    {
 		    targetCellPosition.Y++;
-		    canMove = true;
+		    isMoving = true;
 	    } else if (@event.IsActionPressed("move_left"))
 	    {
 		    targetCellPosition.X--;
-		    canMove = true;
+		    isMoving = true;
 	    } else if (@event.IsActionPressed("move_right"))
 	    {
 		    targetCellPosition.X++;
-		    canMove = true;
+		    isMoving = true;
 	    }
 	    
 	    // If the party can move, then move them to the target
-	    if (canMove) ProcessMovement(targetCellPosition);
+	    if (isMoving) ProcessMovement(targetCellPosition);
     }
 
     private void ProcessMovement(Vector2I targetCellPosition)
@@ -135,6 +141,9 @@ public partial class Party : Node2D
 		    //  eventually that will move them to the next screen,
 		    //  but for now just don't let them move
 		    GD.Print("CAN'T MOVE OFF THE GRID");
+
+		    EmitSignal(SignalName.PartyLeavingGrid, _currentGridPosition);
+		    
 		    return;
 	    }
 	    

@@ -32,7 +32,7 @@ public partial class Global : Node
         CallDeferred(MethodName.DeferredGotoScene, path);
     }
 
-    public void DeferredGotoScene(string path)
+    private void DeferredGotoScene(string path)
     {
         // It is now safe to remove the current scene...
         CurrentScene.Free();
