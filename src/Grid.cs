@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using Rogue;
 
 namespace Rogue;
 
@@ -10,6 +11,9 @@ public partial class Grid : Node2D
     private TileSet _tileSet;
     private WaveFunctionCollapse _wfc;
 
+    [Signal]
+    public delegate void PartyLeavingGridEventHandler(Vector2 partyGridLocation);
+
     public override void _Ready()
     {
         base._Ready();
@@ -17,12 +21,15 @@ public partial class Grid : Node2D
         // Load (and cache) the TileSet resource
         _tileSet = (TileSet)ResourceLoader.Load("res://assets/tilesets/colored_packed.tres");
         
-        // Load the initial/current Grid
-        LoadGrid();
+        GD.Print("GRID IS READY");
     }
 
-    private void LoadGrid()
+    public void Initialize(Zone zone, Vector2 gridLocation)
     {
+        // Party is entering a new Grid
+        
+        GD.Print($"ENTERING NEW GRID: {gridLocation}");
+        
         // Create the TileMap
         _tileMap = new TileMap();
         
@@ -70,19 +77,16 @@ public partial class Grid : Node2D
             }
         }
         
-        // Display the non-proc gen map
-        /*for (var x = 0; x < GameConstants.GridWidth; x++)
-        {
-            for (var y = 0; y < GameConstants.GridHeight; y++)
-            {
-                _tileMap.SetCell(0, new Vector2I(x, y), 0, new Vector2I(6, 0));
-            }
-        }*/
-        
         // Add the party as a child of the Grid
         var partyScene = GD.Load<PackedScene>("res://assets/party/party.tscn");
         var party = partyScene.Instantiate<Party>();
         AddChild(party);
+        party.PartyLeavingGrid += PartyOnPartyLeavingGrid;
+    }
+
+    private void PartyOnPartyLeavingGrid(Vector2 partyGridLocation)
+    {
+        EmitSignal(SignalName.PartyLeavingGrid, partyGridLocation);
     }
 
     private GridCell[,] GenerateGridWFC()

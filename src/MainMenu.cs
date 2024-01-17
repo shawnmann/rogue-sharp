@@ -22,7 +22,7 @@ public partial class MainMenu : Control
 
     private void NewGameButtonOnPressed()
     {
-        _global.GotoScene("res://scenes/main/main.tscn");
+        _global.GotoScene("res://scenes/generator/generator.tscn");
     }
     
     private void QuitButtonOnPressed()

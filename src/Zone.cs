@@ -9,18 +9,20 @@ public partial class Zone : Node
     //  grids when the player enters them
 
     public Grid[,] Grids;
+    public Vector2 WorldLocation;
+    public BiomeTypes BiomeType;
 
     public override void _Ready()
     {
         base._Ready();
     }
 
-    public void Initialize()
+    public void Initialize(Vector2 worldLocation, BiomeTypes biomeType)
     {
+        WorldLocation = worldLocation;
+        BiomeType = biomeType;
+        
         // Initialize using the Zone size
         Grids = new Grid[GameConstants.ZoneWidth, GameConstants.ZoneHeight];
-        
-        // TODO: Load up the grids (but really we'll do this on demand as the user
-        //  enters each grid)
     }
 }
