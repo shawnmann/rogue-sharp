@@ -9,6 +9,16 @@ public partial class WaveFunctionCollapse
     private readonly Random _random;
     public GridCell[,] Grid { get; }
     
+    // TODO: Small Object Heap: code that allocates a lot of memory in SOH
+    //  Allocated object type: GridCell[]
+    //  at List<PropertyInfo>.set_Capacity(int)
+    //  at List<PropertyInfo>.AddWithResize()
+    //  at WaveFunctionCollapse.GetCellWithLowestEntropy() in /Users/shawnmann/rogue/src/Generation/WaveFunctionCollapse.cs:line 65 column 17
+    //  at WaveFunctionCollapse.Observe(GridCell) in /Users/shawnmann/rogue/src/Generation/WaveFunctionCollapse.cs:line 201 column 9
+    //  at WaveFunctionCollapse.RunAlgorithm(bool, int, int) in /Users/shawnmann/rogue/src/Generation/WaveFunctionCollapse.cs:line 82 column 13
+    //  at WaveFunctionCollapse.RunAlgorithm(bool, int, int) in /Users/shawnmann/rogue/src/Generation/WaveFunctionCollapse.cs:line 92 column 21
+    //  the above line repeated...
+    
     public WaveFunctionCollapse(int width, int height, List<Tile> sample)
     {
         _random = new Random();
@@ -78,6 +88,9 @@ public partial class WaveFunctionCollapse
         {
             // Find the cell with the least entropy and observe it
             //  i.e. choose a final state for it
+            // TODO: ERROR: System.IndexOutOfRangeException: Index was outside the bounds of the array.
+            // at WaveFunctionCollapse.RunAlgorithm(Boolean solve, Int32 x, Int32 y) in /Users/shawnmann/rogue/src/Generation/WaveFunctionCollapse.cs:line 91
+            // (this next line:)
             GridCell preselectedCell = x == -1 && y == -1 ? null : Grid[x,y];
             var cell = Observe(preselectedCell);
 

@@ -8,7 +8,7 @@ public partial class Party : Node2D
 	private GameState _gameState;
 	
 	[Signal]
-	public delegate void PartyLeavingGridEventHandler(Vector2 partyGridPosition);
+	public delegate void PartyLeavingGridEventHandler(Vector2I partyGridPosition, Vector2I partyDirection);
 	
 	// This will hold where on the grid the party is "located",
 	//  which is just where the party leader is located
@@ -130,6 +130,10 @@ public partial class Party : Node2D
 	    // Where the party started from
 	    var initialCellPosition = _currentGridPosition;
 	    
+	    // What direction they are trying to move
+	    var direction = new Vector2I(initialCellPosition.X - targetCellPosition.X, 
+		    initialCellPosition.Y - targetCellPosition.Y);
+	    
 	    // Check if they are going off the grid
 	    if (targetCellPosition.X >= GameConstants.GridWidth 
 	        || targetCellPosition.Y >= GameConstants.GridHeight
@@ -142,7 +146,7 @@ public partial class Party : Node2D
 		    //  but for now just don't let them move
 		    GD.Print("CAN'T MOVE OFF THE GRID");
 
-		    EmitSignal(SignalName.PartyLeavingGrid, _currentGridPosition);
+		    EmitSignal(SignalName.PartyLeavingGrid, _currentGridPosition, direction);
 		    
 		    return;
 	    }
@@ -165,5 +169,28 @@ public partial class Party : Node2D
     public Vector2I GetCurrentGridPosition()
     {
 	    return _currentGridPosition;
+    }
+
+    public void SetCurrentGridPosition(Vector2I position, Vector2I direction)
+    {
+	    var newPosition = GameConstants.ConvertTileToPosition(position.X, position.Y);
+	    _playerCharacters[0].Position = newPosition;
+	    
+	    // Need to set party's actual position
+	    for (var i = 1; i < _playerCharacters.Count; i++)
+	    {
+		    if (direction == new Vector2I(0, -1) || direction == new Vector2I(0, 1)) {
+			    // Line them up right to left, because they're entering from the top or bottom...
+			    _playerCharacters[i].Position = new Vector2(newPosition.X - GameConstants.TileWidth * i, newPosition.Y);
+		    }
+		    else
+		    {
+			    // Line them up top to bottom, because they're coming from the left or right...
+			    _playerCharacters[i].Position = new Vector2(newPosition.X, newPosition.Y - GameConstants.TileHeight * i);
+		    }
+	    }
+	    
+	    // Set the party's current grid position
+	    _currentGridPosition = position;
     }
 }
