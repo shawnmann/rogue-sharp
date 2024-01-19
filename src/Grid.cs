@@ -7,16 +7,19 @@ namespace Rogue;
 
 public partial class Grid : Node2D
 {
+    private Global _global;
+    private GameState _gameState;
+    
     private TileMap _tileMap;
     private TileSet _tileSet;
     private WaveFunctionCollapse _wfc;
 
-    [Signal]
-    public delegate void PartyLeavingGridEventHandler(Vector2 partyGridLocation);
-
     public override void _Ready()
     {
         base._Ready();
+        
+        _global = GetNode<Global>("/root/Global");
+        _gameState = GetNode<GameState>("/root/GameState");
         
         // Load (and cache) the TileSet resource
         _tileSet = (TileSet)ResourceLoader.Load("res://assets/tilesets/colored_packed.tres");
@@ -76,17 +79,6 @@ public partial class Grid : Node2D
                 }
             }
         }
-        
-        // Add the party as a child of the Grid
-        var partyScene = GD.Load<PackedScene>("res://assets/party/party.tscn");
-        var party = partyScene.Instantiate<Party>();
-        AddChild(party);
-        party.PartyLeavingGrid += PartyOnPartyLeavingGrid;
-    }
-
-    private void PartyOnPartyLeavingGrid(Vector2 partyGridLocation)
-    {
-        EmitSignal(SignalName.PartyLeavingGrid, partyGridLocation);
     }
 
     private GridCell[,] GenerateGridWFC()
