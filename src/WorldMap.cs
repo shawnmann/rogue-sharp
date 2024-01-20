@@ -6,7 +6,8 @@ public partial class WorldMap : Node2D
 {
     private Global _global;
     private GameState _gameState;
-    
+
+    private ColorRect _location;
     private Button _button;
     
     public override void _Ready()
@@ -15,6 +16,10 @@ public partial class WorldMap : Node2D
         
         _global = GetNode<Global>("/root/Global");
         _gameState = GetNode<GameState>("/root/GameState");
+
+        _location = new ColorRect();
+        _location.Size = new Vector2(10, 10);
+        _location.Color = new Color(1, 0, 0);
         
         _button = GetNode<Button>("Button");
         _button.Pressed += ButtonOnPressed;
@@ -23,6 +28,13 @@ public partial class WorldMap : Node2D
         DrawMap();
 
         Visible = false;
+    }
+
+    public override void _Process(double delta)
+    {
+        base._Process(delta);
+        
+        HighlightLocation();
     }
 
     private void DrawMap()
@@ -59,6 +71,15 @@ public partial class WorldMap : Node2D
                 rect.MouseEntered += () => GD.Print(biome);
             }
         }
+        
+        AddChild(_location);
+        HighlightLocation();
+    }
+
+    private void HighlightLocation()
+    {
+        _location.GlobalPosition = new Vector2(_gameState.CurrentZone.WorldLocation.X * 10, 
+            _gameState.CurrentZone.WorldLocation.Y * 10);
     }
     
     private void ButtonOnPressed()

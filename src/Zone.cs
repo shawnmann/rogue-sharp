@@ -9,15 +9,10 @@ public partial class Zone : Node
     //  grids when the player enters them
 
     public Grid[,] Grids;
-    public Vector2 WorldLocation;
+    public Vector2I WorldLocation;
     public BiomeTypes BiomeType;
 
-    public override void _Ready()
-    {
-        base._Ready();
-    }
-
-    public void Initialize(Vector2 worldLocation, BiomeTypes biomeType)
+    public void Initialize(Vector2I worldLocation, BiomeTypes biomeType)
     {
         WorldLocation = worldLocation;
         BiomeType = biomeType;

@@ -34,7 +34,7 @@ public partial class World : Node
                 var biomeType = WorldInfo[x, y].BiomeType;
                 
                 var z = new Zone();
-                z.Initialize(new Vector2(x, y), biomeType);
+                z.Initialize(new Vector2I(x, y), biomeType);
                 Zones[x, y] = z;
             }
         }
