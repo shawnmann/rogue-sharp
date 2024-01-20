@@ -9,6 +9,8 @@ public partial class Grid : Node2D
 {
     private Global _global;
     private GameState _gameState;
+
+    public Vector2I ZoneLocation;
     
     private TileMap _tileMap;
     private TileSet _tileSet;
@@ -27,11 +29,18 @@ public partial class Grid : Node2D
         GD.Print("GRID IS READY");
     }
 
-    public void Initialize(Zone zone, Vector2 gridLocation)
+    public void Initialize(Zone zone, Vector2I locationWithinZone)
     {
         // Party is entering a new Grid
         
-        GD.Print($"ENTERING NEW GRID: {gridLocation}");
+        GD.Print($"ENTERING NEW GRID");
+        // Add this grid to this zone...
+        _gameState.World
+            .Zones[zone.WorldLocation.X, zone.WorldLocation.Y]
+            .Grids[ZoneLocation.X, ZoneLocation.Y] = this;
+
+        // Set this Grid's location within its Zone
+        ZoneLocation = locationWithinZone;
         
         // Create the TileMap
         _tileMap = new TileMap();
