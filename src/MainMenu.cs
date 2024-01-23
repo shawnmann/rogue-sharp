@@ -4,7 +4,9 @@ using System;
 public partial class MainMenu : Control
 {
     private Global _global;
+    
     private Button _newGameButton;
+    private Button _loadGameButton;
     private Button _quitButton;
     
     public override void _Ready()
@@ -16,6 +18,9 @@ public partial class MainMenu : Control
         _newGameButton = GetNode<Button>("%NewGameButton");
         _newGameButton.Pressed += NewGameButtonOnPressed;
 
+        _loadGameButton = GetNode<Button>("%LoadGameButton");
+        _loadGameButton.Pressed += LoadGameButtonOnPressed;
+
         _quitButton = GetNode<Button>("%QuitButton");
         _quitButton.Pressed += QuitButtonOnPressed;
     }
@@ -23,6 +28,11 @@ public partial class MainMenu : Control
     private void NewGameButtonOnPressed()
     {
         _global.GotoScene("res://scenes/generator/generator.tscn");
+    }
+    
+    private void LoadGameButtonOnPressed()
+    {
+        _global.LoadGame();
     }
     
     private void QuitButtonOnPressed()
