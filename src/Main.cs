@@ -9,6 +9,7 @@ public partial class Main : Node
     
     private Grid _grid;
     private WorldMap _worldMap;
+    private GameMenu _gameMenu;
     private Party _party;
     
     private SubViewport _subViewport;
@@ -22,6 +23,12 @@ public partial class Main : Node
 
         _global = GetNode<Global>("/root/Global");
         _gameState = GetNode<GameState>("/root/GameState");
+        
+        // See if there's loaded data and load it, otherwise it's a new game...
+        if (_global.LoadedGameData != null)
+        {
+            _gameState.LoadData();
+        }
 
         // Construct the header...
         _headerHBoxContainer = GetNode<HBoxContainer>("VBoxContainer/HeaderHBoxContainer");
@@ -31,6 +38,10 @@ public partial class Main : Node
         _headerHBoxContainer.AddChild(_headerGridLabel);
         
         InitializeGrid();
+
+        var gameMenuScene = GD.Load<PackedScene>("res://scenes/game_menu/game_menu.tscn");
+        _gameMenu = gameMenuScene.Instantiate<GameMenu>();
+        AddChild(_gameMenu);
     }
 
     public override void _Process(double delta)
@@ -230,6 +241,9 @@ public partial class Main : Node
         if (@event.IsActionPressed("world_map"))
         {
             _worldMap.Visible = !_worldMap.Visible;
+        } else if (@event.IsActionPressed("escape"))
+        {
+            _gameMenu.Visible = !_gameMenu.Visible;
         }
     }
 }
