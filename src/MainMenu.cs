@@ -33,6 +33,7 @@ public partial class MainMenu : Control
     private void LoadGameButtonOnPressed()
     {
         _global.LoadGame();
+        _global.GotoScene("res://scenes/generator/generator.tscn");
     }
     
     private void QuitButtonOnPressed()
