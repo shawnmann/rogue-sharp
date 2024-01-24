@@ -23,12 +23,6 @@ public partial class Main : Node
 
         _global = GetNode<Global>("/root/Global");
         _gameState = GetNode<GameState>("/root/GameState");
-        
-        // See if there's loaded data and load it, otherwise it's a new game...
-        if (_global.LoadedGameData != null)
-        {
-            _gameState.LoadData();
-        }
 
         // Construct the header...
         _headerHBoxContainer = GetNode<HBoxContainer>("VBoxContainer/HeaderHBoxContainer");

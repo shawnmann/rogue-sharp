@@ -26,9 +26,15 @@ public partial class GameState : Node
         };
     }
 
-    public void LoadData()
+    public void LoadData(Godot.Collections.Dictionary<string, Variant> saveData)
     {
         GD.Print("GAME STATE LOAD DATA");
+        
         // TODO: Call "LoadData" on game objects instead of starting a new game
+
+        var world = new World();
+        world.LoadData(saveData);
+        //world.Initialize();  // This initializes a new World, so we prob don't need it here
+        World = world;
     }
 }
