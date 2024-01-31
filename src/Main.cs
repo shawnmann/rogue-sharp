@@ -43,15 +43,17 @@ public partial class Main : Node
         base._Process(delta);
         
         _headerZoneLabel.Text = $"Zone: {_gameState.CurrentZone.WorldLocation}";
-        _headerGridLabel.Text = $" - Grid: {_gameState.CurrentGrid.ZoneLocation}";
+        _headerGridLabel.Text = $" - Grid: {_gameState.CurrentGrid.GridZoneLocation}";
     }
 
     private void InitializeGrid()
     {
-        // If this is a new game, set the zone, or set it from the save file...
-        // But for now, just pick one...
-        var zone = _gameState.World.Zones[5, 5];
-        _gameState.CurrentZone = zone;
+        // If this is a new game, set the starting zone, if not, this was already set from the save file...
+        if (_global.LoadedGameData == null)
+        {
+            var zone = _gameState.World.Zones[5, 5];
+            _gameState.CurrentZone = zone;
+        }
 
         // Add the game play area as a SubViewPort in the layout of Main
         _subViewport = GetNode<SubViewport>("VBoxContainer/HBoxContainer/SubViewportContainer/SubViewport"); 
@@ -62,7 +64,7 @@ public partial class Main : Node
         _subViewport.AddChild(_grid);
         // Need to load this from a save later, but for now, let's new game it and make the starting Grid
         //  the center section of the Zone...
-        _grid.Initialize(zone, new Vector2I(1, 1));
+        _grid.Initialize(_gameState.CurrentZone, new Vector2I(1, 1));
         _gameState.CurrentGrid = _grid;
         
         // Add the party as a child of the Grid
@@ -111,7 +113,7 @@ public partial class Main : Node
             partyNewGridPosition = new Vector2I(GameConstants.GridWidth - 1, partyGridLocation.Y);
 
             // Check if they are moving out of the zone
-            if (_gameState.CurrentGrid.ZoneLocation.X == 0)
+            if (_gameState.CurrentGrid.GridZoneLocation.X == 0)
             {
                 // They are moving out of the zone
                 GD.Print("MOVING OUT OF THE ZONE");
@@ -121,19 +123,19 @@ public partial class Main : Node
                 _gameState.CurrentZone = newZone;
                 
                 // Set the Grid's location within the new zone
-                newGridPositionWithinZone = new Vector2I(GameConstants.ZoneWidth - 1, _gameState.CurrentGrid.ZoneLocation.Y);
+                newGridPositionWithinZone = new Vector2I(GameConstants.ZoneWidth - 1, _gameState.CurrentGrid.GridZoneLocation.Y);
             }
             else
             {
                 // Set the Grid's location within its zone
-                newGridPositionWithinZone = new Vector2I(_gameState.CurrentGrid.ZoneLocation.X - 1, _gameState.CurrentGrid.ZoneLocation.Y);
+                newGridPositionWithinZone = new Vector2I(_gameState.CurrentGrid.GridZoneLocation.X - 1, _gameState.CurrentGrid.GridZoneLocation.Y);
             }
         } else if (partyDirection == new Vector2I(-1, 0))
         {
             // They are moving right
             GD.Print("EXITING RIGHT");
 
-            if (_gameState.CurrentGrid.ZoneLocation.X == GameConstants.ZoneWidth - 1)
+            if (_gameState.CurrentGrid.GridZoneLocation.X == GameConstants.ZoneWidth - 1)
             {
                 // They are moving out of the zone
                 GD.Print("MOVING OUT OF THE ZONE");
@@ -145,12 +147,12 @@ public partial class Main : Node
                 _gameState.CurrentZone = newZone;
                 
                 // Set the Grid's location within the new zone
-                newGridPositionWithinZone = new Vector2I(0, _gameState.CurrentGrid.ZoneLocation.Y);
+                newGridPositionWithinZone = new Vector2I(0, _gameState.CurrentGrid.GridZoneLocation.Y);
             }
             else
             {
                 // Set the Grid's location within its zone
-                newGridPositionWithinZone = new Vector2I(_gameState.CurrentGrid.ZoneLocation.X + 1, _gameState.CurrentGrid.ZoneLocation.Y);
+                newGridPositionWithinZone = new Vector2I(_gameState.CurrentGrid.GridZoneLocation.X + 1, _gameState.CurrentGrid.GridZoneLocation.Y);
             }
             
             partyNewGridPosition = new Vector2I(0, partyGridLocation.Y);
@@ -159,7 +161,7 @@ public partial class Main : Node
             // They are moving down
             GD.Print("EXITING DOWN");
 
-            if (_gameState.CurrentGrid.ZoneLocation.Y == GameConstants.ZoneHeight - 1)
+            if (_gameState.CurrentGrid.GridZoneLocation.Y == GameConstants.ZoneHeight - 1)
             {
                 // They are moving out of the zone
                 GD.Print("MOVING OUT OF THE ZONE");
@@ -171,12 +173,12 @@ public partial class Main : Node
                 _gameState.CurrentZone = newZone;
                 
                 // Set the Grid's location within the new zone
-                newGridPositionWithinZone = new Vector2I(_gameState.CurrentGrid.ZoneLocation.X, 0);
+                newGridPositionWithinZone = new Vector2I(_gameState.CurrentGrid.GridZoneLocation.X, 0);
             }
             else
             {
                 // Set the Grid's location within its zone
-                newGridPositionWithinZone = new Vector2I(_gameState.CurrentGrid.ZoneLocation.X, _gameState.CurrentGrid.ZoneLocation.Y + 1);
+                newGridPositionWithinZone = new Vector2I(_gameState.CurrentGrid.GridZoneLocation.X, _gameState.CurrentGrid.GridZoneLocation.Y + 1);
             }
             
             partyNewGridPosition = new Vector2I(partyGridLocation.X, 0);
@@ -185,7 +187,7 @@ public partial class Main : Node
             // They are moving up
             GD.Print("EXITING UP");
             
-            if (_gameState.CurrentGrid.ZoneLocation.Y == 0)
+            if (_gameState.CurrentGrid.GridZoneLocation.Y == 0)
             {
                 // They are moving out of the zone
                 GD.Print("MOVING OUT OF THE ZONE");
@@ -197,12 +199,12 @@ public partial class Main : Node
                 _gameState.CurrentZone = newZone;
                 
                 // Set the Grid's location within the new zone
-                newGridPositionWithinZone = new Vector2I(_gameState.CurrentGrid.ZoneLocation.X, GameConstants.ZoneHeight - 1);
+                newGridPositionWithinZone = new Vector2I(_gameState.CurrentGrid.GridZoneLocation.X, GameConstants.ZoneHeight - 1);
             }
             else
             {
                 // Set the Grid's location within its zone
-                newGridPositionWithinZone = new Vector2I(_gameState.CurrentGrid.ZoneLocation.X, _gameState.CurrentGrid.ZoneLocation.Y - 1);
+                newGridPositionWithinZone = new Vector2I(_gameState.CurrentGrid.GridZoneLocation.X, _gameState.CurrentGrid.GridZoneLocation.Y - 1);
             }
             
             partyNewGridPosition = new Vector2I(partyGridLocation.X, GameConstants.GridHeight - 1);
