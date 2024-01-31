@@ -5,9 +5,11 @@ using Rogue;
 
 public class Tile
 {
-    // This is the location of the Tile within the Grid. This
-    //  will also serve as the "id" of the grid
+    // This is the id to help compare tiles...
     public int Id { get; init; }
+    
+    // This is this Tile's position within its Grid...
+    public Vector2I Position { get; set; }
     
     // This is the "value" of the cell,
     //  which for now is a placeholder for the graphical

@@ -4,7 +4,7 @@ using Rogue.Generation.World;
 
 namespace Rogue;
 
-public partial class World : Node
+public partial class World : Node, ISaveable
 {
     private Global _global;
     private GameState _gameState;

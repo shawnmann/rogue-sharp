@@ -54,7 +54,6 @@ public partial class Global : Node
 
     public void SaveGame(GameState gameState)
     {
-        //GD.Print(gameState.SaveData());
         using var saveFile = FileAccess.Open("user://savegame.save", FileAccess.ModeFlags.Write);
         var s = Json.Stringify(gameState.SaveData());
         saveFile.StoreLine(s);

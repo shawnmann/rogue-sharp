@@ -232,6 +232,7 @@ public partial class WaveFunctionCollapse
         
         // And load it with the tile that was selected
         cell.Tile = selectedTile;
+        cell.Tile.Position = new Vector2I(cell.X, cell.Y);
         
         return cell;
     }

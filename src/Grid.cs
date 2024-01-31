@@ -5,15 +5,21 @@ using Rogue;
 
 namespace Rogue;
 
-public partial class Grid : Node2D
+public partial class Grid : Node2D, ISaveable
 {
     private Global _global;
     private GameState _gameState;
 
-    public Vector2I ZoneLocation;
+    // The position of this Grid's Zone in the World
+    public Vector2I ZoneWorldLocation;
+    // The position of this Grid in its Zone
+    public Vector2I GridZoneLocation;
     
+    // Godot TileMap and TileSet to help do Godot tiling stuff
     private TileMap _tileMap;
     private TileSet _tileSet;
+    
+    // Proc gen to help make the Grid
     private WaveFunctionCollapse _wfc;
 
     public override void _Ready()
@@ -32,15 +38,19 @@ public partial class Grid : Node2D
     public void Initialize(Zone zone, Vector2I locationWithinZone)
     {
         // Party is entering a new Grid
-        
         GD.Print($"ENTERING NEW GRID");
+        
         // Add this grid to this zone...
         _gameState.World
             .Zones[zone.WorldLocation.X, zone.WorldLocation.Y]
-            .Grids[ZoneLocation.X, ZoneLocation.Y] = this;
+            .Grids[locationWithinZone.X, locationWithinZone.Y] = this;
+        
+        // Store the location within the world of the Zone that this
+        //  Grid belongs to
+        ZoneWorldLocation = zone.WorldLocation;
 
         // Set this Grid's location within its Zone
-        ZoneLocation = locationWithinZone;
+        GridZoneLocation = locationWithinZone;
         
         // Create the TileMap
         _tileMap = new TileMap();
@@ -58,6 +68,7 @@ public partial class Grid : Node2D
         _tileMap.SetLayerZIndex(0, 0);
         
         // Generate a Grid using WFC
+        // TODO: Or load a saved grid from save data...
         var wfcGrid = GenerateGridWFC();
         
         // Display the WFC map
@@ -65,10 +76,12 @@ public partial class Grid : Node2D
         {
             for (var y = 0; y < wfcGrid.GetLength(1); y++)
             {
+                // Grab this cell...
                 var c = wfcGrid[x, y];
 
                 if (c.Tile != null)
                 {
+                    // Figure out what to graphically display...
                     var tileType = Vector2I.Zero;
                     
                     switch (c.Tile.Value)
@@ -152,5 +165,50 @@ public partial class Grid : Node2D
         _wfc.RunAlgorithm(true, randomX, randomY);
 
         return _wfc.Grid;
+    }
+
+    public Godot.Collections.Dictionary<string, Variant> SaveData()
+    {
+        // Serialize this Grid...
+
+        var zoneWorldLocation = new Godot.Collections.Dictionary<string, Variant>()
+        {
+            { "X", ZoneWorldLocation.X },
+            { "Y", ZoneWorldLocation.Y }
+        };
+
+        var gridZoneLocation = new Godot.Collections.Dictionary<string, Variant>()
+        {
+            { "X", GridZoneLocation.X },
+            { "Y", GridZoneLocation.Y }
+        };
+
+        var saveData = new Godot.Collections.Dictionary<string, Variant>()
+        {
+            { "ZoneWorldLocation", zoneWorldLocation },
+            { "GridZoneLocation", gridZoneLocation }
+        };
+
+        return saveData;
+    }
+
+    public void LoadData(Godot.Collections.Dictionary<string, Variant> saveData)
+    {
+        // Deserialize this Grid...
+        
+        if (saveData == null)
+        {
+            GD.Print("LOADED GRID DATA IS NULL");
+            // TODO: Need to handle this gracefully, because even returning here is going to cause the game to error...
+            return;
+        }
+
+        var zoneWorldLocation = (Godot.Collections.Dictionary<string, Variant>)saveData["ZoneWorldLocation"];
+        ZoneWorldLocation = new Vector2I((int)zoneWorldLocation["X"], (int)zoneWorldLocation["Y"]);
+        
+        var gridZoneLocation = (Godot.Collections.Dictionary<string, Variant>)saveData["GridZoneLocation"];
+        GridZoneLocation = new Vector2I((int)gridZoneLocation["X"], (int)gridZoneLocation["Y"]);
+        
+        
     }
 }
