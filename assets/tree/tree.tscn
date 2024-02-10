@@ -1,3 +1,26 @@
-[gd_scene format=3 uid="uid://bjibgjuayf104"]
+[gd_scene load_steps=8 format=3 uid="uid://bjibgjuayf104"]
+
+[ext_resource type="Script" path="res://src/Tree.cs" id="1_ie505"]
+[ext_resource type="Script" path="res://src/Components/HealthComponent.cs" id="2_ly8wm"]
+[ext_resource type="Resource" uid="uid://cmigy4ir5l26s" path="res://assets/tree/tree_health_resource.tres" id="3_bejl1"]
+[ext_resource type="Script" path="res://src/Components/EntityComponent.cs" id="4_55syv"]
+[ext_resource type="Resource" uid="uid://dbr52k5y3867k" path="res://assets/tree/tree_entity_resource.tres" id="5_0mr4t"]
+[ext_resource type="Script" path="res://src/Components/StatsComponent.cs" id="6_ad6mw"]
+[ext_resource type="Resource" uid="uid://x7i0vokl686l" path="res://assets/tree/tree_stats_resource.tres" id="7_8iuo8"]
 
 [node name="Tree" type="Node2D"]
+script = ExtResource("1_ie505")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2_ly8wm")
+HealthResource = ExtResource("3_bejl1")
+
+[node name="EntityComponent" type="Node" parent="."]
+script = ExtResource("4_55syv")
+EntityResource = ExtResource("5_0mr4t")
+
+[node name="StatsComponent" type="Node" parent="."]
+script = ExtResource("6_ad6mw")
+StatsResource = ExtResource("7_8iuo8")

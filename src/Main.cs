@@ -83,6 +83,14 @@ public partial class Main : Node
         var worldMapScene = GD.Load<PackedScene>("res://scenes/world_map/world_map.tscn");
         _worldMap = worldMapScene.Instantiate<WorldMap>();
         AddChild(_worldMap);
+
+        var treeScene = GD.Load<PackedScene>("res://assets/tree/tree.tscn");
+        var tree = treeScene.Instantiate<Tree>();
+        _grid.AddChild(tree);
+        tree.Initialize();
+        tree.Position = new Vector2(10 * GameConstants.TileWidth, 10 * GameConstants.TileHeight);
+        GD.Print($"{tree.EntityComponent.EntityName} HP: {tree.HealthComponent.CurrentHealth}/{tree.HealthComponent.MaxHealth}");
+        GD.Print($"{tree.EntityComponent.EntityName} {tree.StatsComponent.QuickName}: {tree.StatsComponent.Quick}");
     }
 
     private void LoadGrid(Vector2I partyGridLocation, Vector2I partyDirection)

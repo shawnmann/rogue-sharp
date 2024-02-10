@@ -1,15 +1,14 @@
 using Godot;
 using System;
 
-public partial class StatsResource : Node
+[GlobalClass]
+public partial class StatsResource : Resource
 {
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
-	{
-	}
-
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
-	}
+    [Export] public int Moxie { get; set; } = 1;
+    [Export] public int Psyche { get; set; } = 1;
+    [Export] public int Smarts { get; set; } = 1;
+    [Export] public int Wits { get; set; } = 1;
+    [Export] public int Muscle { get; set; } = 1;
+    [Export] public int Cool { get; set; } = 1;
+    [Export] public int Quick { get; set; } = 1;
 }
