@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="StatsResource" load_steps=2 format=3 uid="uid://x7i0vokl686l"]
+
+[ext_resource type="Script" path="res://src/Resources/StatsResource.cs" id="1_rh646"]
+
+[resource]
+script = ExtResource("1_rh646")
+Moxie = 3
+Psyche = 1
+Smarts = 1
+Wits = 1
+Muscle = 1
+Cool = 1
+Quick = 1

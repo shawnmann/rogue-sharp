@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="EntityResource" load_steps=2 format=3 uid="uid://dbr52k5y3867k"]
+
+[ext_resource type="Script" path="res://src/Resources/EntityResource.cs" id="1_j8mdi"]
+
+[resource]
+script = ExtResource("1_j8mdi")
+EntityName = "Tree"

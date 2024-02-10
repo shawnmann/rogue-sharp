@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="HealthResource" load_steps=2 format=3 uid="uid://cmigy4ir5l26s"]
+
+[ext_resource type="Script" path="res://src/Resources/HealthResource.cs" id="1_pqg05"]
+
+[resource]
+script = ExtResource("1_pqg05")
+MaxHealth = 5
