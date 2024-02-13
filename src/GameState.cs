@@ -6,6 +6,8 @@ public partial class GameState : Node
 {
     // This should basically be the game save data...right?
     
+    public GameStates CurrentGameState { get; set; }
+    
     public World World { get; set; }
     public Zone CurrentZone { get; set; }
     public Grid CurrentGrid { get; set; }

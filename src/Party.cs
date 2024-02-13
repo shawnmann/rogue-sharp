@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Rogue;
 
 public partial class Party : Node2D
 {
@@ -18,6 +19,8 @@ public partial class Party : Node2D
     public override void _Ready()
     {
         base._Ready();
+        
+        _gameState = GetNode<GameState>("/root/GameState");
         
         // Load the PlayerCharacter scene
         var playerCharacterScene = GD.Load<PackedScene>("res://assets/player_character/player_character.tscn");
@@ -96,6 +99,9 @@ public partial class Party : Node2D
     public override void _Input(InputEvent @event)
     {
 	    base._Input(@event);
+	    
+	    if (_gameState.CurrentGameState != GameStates.Game)
+		    return;
 
 	    // This will hold where the party is trying to move to, if they are moving
 	    var targetCellPosition = _currentGridPosition;

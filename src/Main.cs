@@ -11,9 +11,11 @@ public partial class Main : Node
     private WorldMap _worldMap;
     private GameMenu _gameMenu;
     private Party _party;
+    private Looker _looker;
     
     private SubViewport _subViewport;
     private HBoxContainer _headerHBoxContainer;
+    private Label _headerGameModeLabel;
     private Label _headerZoneLabel;
     private Label _headerGridLabel;
     
@@ -26,6 +28,8 @@ public partial class Main : Node
 
         // Construct the header...
         _headerHBoxContainer = GetNode<HBoxContainer>("VBoxContainer/HeaderHBoxContainer");
+        _headerGameModeLabel = new Label();
+        _headerHBoxContainer.AddChild(_headerGameModeLabel);
         _headerZoneLabel = new Label();
         _headerHBoxContainer.AddChild(_headerZoneLabel);
         _headerGridLabel = new Label();
@@ -36,13 +40,17 @@ public partial class Main : Node
         var gameMenuScene = GD.Load<PackedScene>("res://scenes/game_menu/game_menu.tscn");
         _gameMenu = gameMenuScene.Instantiate<GameMenu>();
         AddChild(_gameMenu);
+
+        // Start the game in "playing" mode
+        _gameState.CurrentGameState = GameStates.Game;
     }
 
     public override void _Process(double delta)
     {
         base._Process(delta);
-        
-        _headerZoneLabel.Text = $"Zone: {_gameState.CurrentZone.WorldLocation}";
+
+        _headerGameModeLabel.Text = $"Mode: {_gameState.CurrentGameState}";
+        _headerZoneLabel.Text = $" - Zone: {_gameState.CurrentZone.WorldLocation}";
         _headerGridLabel.Text = $" - Grid: {_gameState.CurrentGrid.GridZoneLocation}";
     }
 
@@ -91,6 +99,12 @@ public partial class Main : Node
         tree.Position = new Vector2(10 * GameConstants.TileWidth, 10 * GameConstants.TileHeight);
         GD.Print($"{tree.EntityComponent.EntityName} HP: {tree.HealthComponent.CurrentHealth}/{tree.HealthComponent.MaxHealth}");
         GD.Print($"{tree.EntityComponent.EntityName} {tree.StatsComponent.QuickName}: {tree.StatsComponent.Quick}");
+        
+        // Add the looker scene
+        var lookerScene = GD.Load<PackedScene>("res://assets/looker/looker.tscn");
+        _looker = lookerScene.Instantiate<Looker>();
+        _grid.AddChild(_looker);
+        _looker.LookerLooked += LookerOnLookerLooked;
     }
 
     private void LoadGrid(Vector2I partyGridLocation, Vector2I partyDirection)
@@ -237,17 +251,54 @@ public partial class Main : Node
     {
         LoadGrid(partyGridLocation, partyDirection);
     }
+    
+    private void LookerOnLookerLooked(Vector2I gridPosition)
+    {
+        // TODO: Ok, now need to look at the actual tile...
+        GD.Print($"Looked at {gridPosition}");
+    }
 
     public override void _Input(InputEvent @event)
     {
         base._Input(@event);
+        
+        // Let's use the main input handler for opening and closing modals, etc.
+        //  but not specific inputs.
 
         if (@event.IsActionPressed("world_map"))
         {
+            // Open or close the world map
             _worldMap.Visible = !_worldMap.Visible;
+            _gameState.CurrentGameState = _worldMap.Visible ? GameStates.Map : GameStates.Game;
         } else if (@event.IsActionPressed("escape"))
         {
-            _gameMenu.Visible = !_gameMenu.Visible;
+            if (_gameState.CurrentGameState != GameStates.Game)
+            {
+                // It's not Game mode, so escape out of whatever GameStates mode we are in, and close any
+                // modal that is open, then switch to Game mode...
+                _worldMap.Visible = false;
+                _gameMenu.Visible = false;
+                _looker.StopLooking();
+                _gameState.CurrentGameState = GameStates.Game;
+            }
+            else
+            {
+                // We're in Game mode, so open or close the game menu
+                _gameMenu.Visible = !_gameMenu.Visible;
+                _gameState.CurrentGameState = _gameMenu.Visible ? GameStates.GameMenu : GameStates.Game;
+            }
+        } else if (@event.IsActionPressed("look"))
+        {
+            // Look around
+            _gameState.CurrentGameState = GameStates.Look;
+
+            // Just default to the player position, for now...
+            var position= _gameState.CurrentParty.GetCurrentGridPosition();
+            
+            GD.Print($"LOOK AT: {position}");
+            
+            // Look!
+            _looker.StartLooking(position);
         }
     }
 }
