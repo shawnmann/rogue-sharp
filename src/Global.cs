@@ -52,6 +52,16 @@ public partial class Global : Node
         GetTree().CurrentScene = CurrentScene;
     }
 
+    public T GetFirstChildOfType<T>(Node node) where T : Node
+    {
+        foreach (Node child in node.GetChildren())
+        {
+            if (child is T typedChild)
+                return typedChild;
+        }
+        return null;
+    }
+
     public void SaveGame(GameState gameState)
     {
         using var saveFile = FileAccess.Open("user://savegame.save", FileAccess.ModeFlags.Write);
