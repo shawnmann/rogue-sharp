@@ -12,6 +12,9 @@ public partial class Main : Node
     private GameMenu _gameMenu;
     private Party _party;
     private Looker _looker;
+
+    // TODO: Is this the best way to handle grid entities?
+    private Node[,] _gridEntities;
     
     private SubViewport _subViewport;
     private HBoxContainer _headerHBoxContainer;
@@ -91,6 +94,11 @@ public partial class Main : Node
         var worldMapScene = GD.Load<PackedScene>("res://scenes/world_map/world_map.tscn");
         _worldMap = worldMapScene.Instantiate<WorldMap>();
         AddChild(_worldMap);
+        
+        // TODO: Create entities array...
+        // TODO: Also need to load saved grids...
+        // TODO: Also need to decide on generation...just use DeBroglie??
+        _gridEntities = new Node[GameConstants.GridWidth, GameConstants.GridHeight];
 
         var treeScene = GD.Load<PackedScene>("res://assets/tree/tree.tscn");
         var tree = treeScene.Instantiate<Tree>();
@@ -99,6 +107,7 @@ public partial class Main : Node
         tree.Position = new Vector2(10 * GameConstants.TileWidth, 10 * GameConstants.TileHeight);
         GD.Print($"{tree.EntityComponent.EntityName} HP: {tree.HealthComponent.CurrentHealth}/{tree.HealthComponent.MaxHealth}");
         GD.Print($"{tree.EntityComponent.EntityName} {tree.StatsComponent.QuickName}: {tree.StatsComponent.Quick}");
+        _gridEntities[10, 10] = tree;
         
         // Add the looker scene
         var lookerScene = GD.Load<PackedScene>("res://assets/looker/looker.tscn");
@@ -115,8 +124,10 @@ public partial class Main : Node
         //  Proc gen based on biome, etc., then load Grid in, then place Party in the correct
         //  location.
         
-        // Remove the old grid...
+        // Remove the old grid, reset the things...
         _grid.RemoveChild(_party);
+        _grid.RemoveChild(_looker);
+        _gridEntities = new Node[GameConstants.GridWidth, GameConstants.GridHeight];
         _subViewport.RemoveChild(_grid);
         _grid.QueueFree();
         
@@ -241,6 +252,9 @@ public partial class Main : Node
         // Add the party to the grid
         _grid.AddChild(_party);
         
+        // Add the looker to the grid
+        _grid.AddChild(_looker);
+        
         // Set the party's location
         _party.SetCurrentGridPosition(partyNewGridPosition, partyDirection);
         
@@ -254,8 +268,27 @@ public partial class Main : Node
     
     private void LookerOnLookerLooked(Vector2I gridPosition)
     {
-        // TODO: Ok, now need to look at the actual tile...
-        GD.Print($"Looked at {gridPosition}");
+        var message = $"Looked at {gridPosition} ";
+        
+        // TODO: There might be more than one Entity in the location,
+        //  so need to store all of them in a list or something...
+
+        var gridEntity = _gridEntities[gridPosition.X, gridPosition.Y];
+        if (gridEntity != null)
+        {
+            var entity = _global.GetFirstChildOfType<EntityComponent>(gridEntity);
+            if (entity != null)
+            {
+                //var node = _gridEntities[gridPosition.X, gridPosition.Y];
+                message += $"and found something: {entity.EntityName}";
+            }
+        }
+        else
+        {
+            message += "and found nothing...";
+        }
+        
+        GD.Print(message);
     }
 
     public override void _Input(InputEvent @event)
